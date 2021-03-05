@@ -34,7 +34,7 @@ include ../makefile-arch.inc
 
 # default settings - allow for cross compile of library 
 CC=$(CROSS_COMPILE)gcc
-CFLAGS=-Wall -Wno-switch
+CFLAGS=-Wall -Wno-switch -mcpu=cortex-a9
 
 LIB_DIR = ../lib/$(ARCH)/rel
 LIB_DIR_BM=../lib/$(ARCH)/rel_bm

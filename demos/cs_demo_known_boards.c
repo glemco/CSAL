@@ -512,6 +512,62 @@ static int do_registration_axx5500(struct cs_devices_t *devices)
     return 0;
 }
 
+static int do_registration_zynq(struct cs_devices_t *devices)
+{
+    enum { A9_0, A9_1 };
+    cs_device_t rep, funnel, tpiu;
+    int i;
+
+    if (registration_verbose)
+        printf("CSDEMO: Registering CoreSight devices...\n");
+    cs_register_romtable(0xf8800000);
+
+    if (registration_verbose)
+        printf("CSDEMO: Registering CPU affinities...\n");
+    /* PTMs */
+    cs_device_set_affinity(cs_device_register(0xf889c000), A9_0);
+    cs_device_set_affinity(cs_device_register(0xf889d000), A9_1);
+    /* CTIs */
+    cs_device_set_affinity(cs_device_register(0xf8898000), A9_0);
+    cs_device_set_affinity(cs_device_register(0xf8899000), A9_1);
+    /* PMUs */
+    cs_device_set_affinity(cs_device_register(0xf8891000), A9_0);
+    cs_device_set_affinity(cs_device_register(0xf8893000), A9_1);
+    /* debug affinities */
+    cs_device_set_affinity(cs_device_register(0xf8890000), A9_0);
+    cs_device_set_affinity(cs_device_register(0xf8892000), A9_1);
+
+    if (registration_verbose)
+        printf("CSDEMO: Registering trace-bus connections...\n");
+    funnel = cs_device_get(0xf8804000);
+    cs_atb_register(cs_cpu_get_device(A9_0, CS_DEVCLASS_SOURCE), 0, funnel,
+                    0);
+    cs_atb_register(cs_cpu_get_device(A9_1, CS_DEVCLASS_SOURCE), 0, funnel,
+                    1);
+    /* 2 is the ITM, 3-7 unused */
+
+    devices->etb = cs_device_get(0xf8801000);
+    cs_atb_register(funnel, 0, devices->etb, 0);
+
+    rep = cs_atb_add_replicator(2);
+    cs_atb_register(rep, 0, devices->etb, 0);
+
+    tpiu = cs_device_get(0xf8803000);
+    cs_atb_register(rep, 1, tpiu, 0);
+
+    devices->itm = cs_device_register(0xf8805000);
+    cs_atb_register(devices->itm, 0, funnel, 2);
+
+    for (i = 0; i < 2; ++i) {
+#ifndef BAREMETAL
+        devices->cpu_id[i] = cpu_id[i];
+#else
+        devices->cpu_id[i] = 0xC09;
+#endif
+    }
+    return 0;
+}
+
 const struct board known_boards[] = {
     {
         .do_registration = do_registration_arndale,
@@ -537,6 +593,10 @@ const struct board known_boards[] = {
         .do_registration = do_registration_axx5500,
         .n_cpu = 16,
         .hardware = "LSI Axxia",
+    }, {
+        .do_registration = do_registration_zynq,
+        .n_cpu = 2,
+        .hardware = "Xilinx Zynq Platform",
     },
     {}
 };

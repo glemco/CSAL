@@ -24,8 +24,8 @@
 
 int main(int argc, char **argv)
 {
-    unsigned long romAddr = 0x10880000;	/* arndale */
-    int do_custom = 0;
+    unsigned long romAddr = 0xf8800000;	/* zynq */
+    int do_custom = 1;
     int argidx = 1;
     unsigned long exclude_lo, exclude_hi;
 
@@ -44,6 +44,11 @@ int main(int argc, char **argv)
                 romAddr = 0x801A0000;
                 do_custom = 1;
                 printf("** CSLS: using Snowball ROM address 0x%08lX\n",
+                       romAddr);
+			} else if (strcmp(argv[argidx], "-arndale") == 0) {
+                romAddr = 0x10880000;
+                do_custom = 0;
+                printf("** CSLS: using Arndale ROM address 0x%08lX\n",
                        romAddr);
             } else if (strcmp(argv[argidx], "-romaddr") == 0) {
                 if (argc > ++argidx) {
@@ -82,7 +87,9 @@ int main(int argc, char **argv)
             } else if ((strcmp(argv[argidx], "--help") == 0)
                        || (strcmp(argv[argidx], "-help") == 0)) {
                 printf
-                    ("** CSLS: Usage\n   csls [{-snowball} | {-romaddr 0xNNNNNNNN {-exclude <addr_lo> <addr_hi>}*}]\n   No options uses default romaddress 0x10880000 for Arndale platform\n");
+                    ("** CSLS: Usage\n   csls [{-snowball} | {-arndale} | {-romaddr 0xNNNNNNNN {-exclude <addr_lo> <addr_hi>}*}]\n   No options uses default romaddress 0x10880000 for Zynq platform\n");
+                printf
+                    ("    -arndale - uses arndale rom address - standalone option\n    -romaddr 0xNNNNNNNN uses 0xNNNNNNNN as ROM Address\n");
                 printf
                     ("    -snowball - uses snowball rom address - standalone option\n    -romaddr 0xNNNNNNNN uses 0xNNNNNNNN as ROM Address\n");
                 printf
