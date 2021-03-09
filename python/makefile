@@ -21,7 +21,7 @@
 
 ####################################
 # tool settings - python module build without using python build utilites
-CC=gcc
+CC=$(CROSS_COMPILE)gcc
 
 # gcc flags - these match those used by python 2.6 build utilities.
 #           - tune according to your python
@@ -75,7 +75,7 @@ CSINCS= $(INC_DIR)/csaccess.h \
 		$(INC_DIR)/cs_trace_sink.h \
 		$(INC_DIR)/cs_trace_source.h \
 		$(INC_DIR)/csregisters.h \
-		$(DEMO_INC_DIR)/csregistration.h
+		$(INC_DIR)/csregistration.h
 
 ####################################
 #

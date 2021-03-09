@@ -32,15 +32,15 @@
 
 # default settings
 CC=gcc
-CFLAGS=-Wall -Werror=implicit-function-declaration -Wno-switch -fno-omit-frame-pointer
+CFLAGS=-Wall -Werror=implicit-function-declaration -Wno-switch -fno-omit-frame-pointer -I ../demos
 
 # extra per example specific options
 CFLAGS_EX=
 
 # directories
-CS_LIB_DIR = ../lib/rel
-BUILD_DIR=./rel
-BIN_DIR=../bin/rel
+CS_LIB_DIR = ../lib/$(ARCH)/rel
+BUILD_DIR=./rel-$(ARCH)
+BIN_DIR=../bin/$(ARCH)/rel
 
 
 # build options
@@ -96,12 +96,12 @@ $(CS_LIB_DIR)/lib$(LIB_NAME).a $(CS_LIB_DIR)/lib$(LIB_NAME_UTIL).a:
 	@$(MAKE) -C ../build
 
 # **** the known boards source
-CSBOARDS_SRC=../demo/cs_demo_known_boards.c
+CSBOARDS_SRC=../demos/cs_demo_known_boards.c
 
 #  **** build the topology generator utility
 TOPOGEN_SRC=topogen.c $(CSBOARDS_SRC) cs_topology_detect.c cs_topology_print.c
 
-topogen: $(TOPOGEN_SRC) $(CS_LIB_DIR)/lib$(LIB_NAME).a $(CS_LIB_DIR)/lib$(LIB_NAME_UTIL).a $(BIN_DIR)/Makefile
+topogen: $(TOPOGEN_SRC) $(CS_LIB_DIR)/lib$(LIB_NAME).a $(CS_LIB_DIR)/lib$(LIB_NAME_UTIL).a $(BIN_DIR)/makefile
 	$(CC) $(CFLAGS) $(INCS) -o $@ $(TOPOGEN_SRC) $(CS_LIB_DIR)/lib$(LIB_NAME).a $(CS_LIB_DIR)/lib$(LIB_NAME_UTIL).a
 
 #  **** build the traceprofile program
@@ -120,7 +120,7 @@ PROF_CFLAGS=
 endif
 
 csprofile: CFLAGS_EX=$(PROF_CFLAGS) -UNDEBUG
-csprofile: bin_dir $(CSTP_OBJS) $(CS_LIB_DIR)/lib$(PROF_LIBNAME).a $(CS_LIB_DIR)/lib$(LIB_NAME_UTIL).a $(BIN_DIR)/Makefile
+csprofile: bin_dir $(CSTP_OBJS) $(CS_LIB_DIR)/lib$(PROF_LIBNAME).a $(CS_LIB_DIR)/lib$(LIB_NAME_UTIL).a $(BIN_DIR)/makefile
 	$(CC) -o $(BIN_DIR)/$@ $(CSTP_OBJS) $(CS_LIB_DIR)/lib$(PROF_LIBNAME).a $(CS_LIB_DIR)/lib$(LIB_NAME_UTIL).a -lrt -lpthread
 
 # clean all object files and libraries
